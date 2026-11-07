@@ -19,7 +19,7 @@ to what the code does now. It edits docs only, never code.
    keys and formats that changed. Include `CLAUDE.md`. Done when every changed thing has
    been searched for.
 3. Edit each stale statement to what the code does now, in the smallest edit, leaving the
-   surrounding prose as it is. Update `docs/parallax/pages/agent-guide/map.md` when files moved.
+   surrounding prose as it is. A stated reason stays unless the code contradicts it. Update `docs/parallax/pages/agent-guide/map.md` when files moved.
 4. Add a page or section only when the change introduces a new subsystem or design decision.
    Place it by meaning (below). A reason the user gave you counts as confirmed; a reason you
    inferred gets the mark:
