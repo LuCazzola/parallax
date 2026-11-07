@@ -1,6 +1,10 @@
+<p align="center"><img src="assets/logo.svg" alt="Parallax logo" width="120"></p>
+
 # Parallax
 
 Docs for two readers, humans and agents, that always follow the code.
+
+**Website:** <https://lucazzola.github.io/parallax/>
 
 Parallax is the shift you see when two viewpoints look at one object. In a codebase, the two
 viewpoints are your picture of the system and what the system does. When they disagree, that is
