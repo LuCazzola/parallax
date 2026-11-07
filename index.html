@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parallax</title>
+<meta name="description" content="A Claude Code plugin that keeps docs true to the code, so you can see when your mental model and your repo drift apart.">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<style>
+  :root {
+    --bg: #fbfaf7; --ink: #1f2933; --muted: #5b6673; --line: #e3e0d8;
+    --blue: #2466a0; --ochre: #a86c10; --code: #f1eee7;
+    --serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14171b; --ink: #e6e8eb; --muted: #9aa5b1; --line: #2c3238;
+      --blue: #7db8ec; --ochre: #e8b25c; --code: #20252b;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.6 var(--sans); }
+  main { max-width: 680px; margin: 0 auto; padding: 48px 20px 40px; }
+  header { display: flex; align-items: center; gap: 16px; margin-bottom: 36px; }
+  header img { width: 64px; height: 64px; flex: none; }
+  h1 { margin: 0; font: 700 32px/1.1 var(--serif); }
+  header p { margin: 4px 0 0; color: var(--muted); font-size: 16px; }
+  h2 { margin: 36px 0 10px; font: 700 21px/1.25 var(--serif); }
+  p { margin: 0 0 14px; }
+  a { color: var(--blue); }
+  blockquote { margin: 0 0 8px; padding-left: 16px; border-left: 3px solid var(--ochre); font: italic 19px/1.5 var(--serif); }
+  blockquote a { color: inherit; text-decoration-color: var(--ochre); text-underline-offset: 3px; }
+  blockquote .entry { display: block; color: var(--muted); font-size: 16px; }
+  .rule { font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 9px 0; border-top: 1px solid var(--line); text-align: left; vertical-align: top; }
+  th { width: 86px; font: 600 15px/1.6 var(--mono); color: var(--ochre); }
+  pre { margin: 0 0 14px; padding: 12px 14px; overflow-x: auto; background: var(--code); border-radius: 6px; font: 14px/1.5 var(--mono); }
+  footer { margin-top: 36px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: 15px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="logo.svg" alt="" width="64" height="64">
+    <div>
+      <h1>Parallax</h1>
+      <p>Docs for humans and agents that always follow the code.</p>
+    </div>
+  </header>
+
+  <blockquote>
+    <a href="https://dictionary.cambridge.org/dictionary/english/parallax">
+      <span class="entry">parallax, noun, uk /ˈpær.ə.læks/ us /ˈper.ə.læks/</span>
+      the effect by which the position of an object seems to change when it is looked at from different positions
+    </a>
+  </blockquote>
+  <p><small>Cambridge Dictionary</small></p>
+
+  <h2>Your repo, seen from two positions</h2>
+  <p>Keeping track of what agents do is hard. They change more code than you can read, so you
+  supervise through a mental model of the system, and that model quietly drifts from what is
+  really there.</p>
+  <p>The moment you think "that's not how I imagined it" is worth catching. It might be a stale
+  page, a real bug, a design flaw, or a misunderstanding. Parallax gives your repo docs that make
+  those moments visible: a <strong>User Guide</strong> where people check the design and the
+  reasons behind it, and an <strong>Agent Guide</strong> that helps agents find their way around.</p>
+  <p class="rule">The code is the oracle, docs follow, and neither implies correctness.</p>
+  <p>If the code is buggy, the docs describe the bug, and a strange behaviour written in plain
+  words is easier to question.</p>
+
+  <h2>Five skills</h2>
+  <table>
+    <tr><th>setup</th><td>Run once. Builds the docs or ports yours, after showing you the plan.</td></tr>
+    <tr><th>sync</th><td>Runs by itself. When code changes, pages move to match it.</td></tr>
+    <tr><th>dive</th><td>A read-only skeptic asks whether what docs and code agree on looks like a bug. Also the whole-repo check.</td></tr>
+    <tr><th>gap</th><td>When your picture differs from the docs, it reads the code and names the cause.</td></tr>
+    <tr><th>ticket</th><td>Keeps a bug or idea for later, and asks first on public repos.</td></tr>
+  </table>
+
+  <h2>Install</h2>
+  <p>In Claude Code, then run setup in the repo you want to document:</p>
+  <pre><code>/plugin install parallax --marketplace LuCazzola/parallax
+/parallax:setup</code></pre>
+
+  <footer>MIT licensed. Source on <a href="https://github.com/LuCazzola/parallax">GitHub</a>.</footer>
+</main>
+</body>
+</html>
