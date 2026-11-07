@@ -1,0 +1,12 @@
+{
+  "name": "parallax",
+  "owner": { "name": "Luca Cazzola" },
+  "plugins": [
+    {
+      "name": "parallax",
+      "description": "Docs for two readers, humans and agents, that always follow the code.",
+      "version": "0.1.0",
+      "source": "./"
+    }
+  ]
+}

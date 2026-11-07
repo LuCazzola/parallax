@@ -1,0 +1,10 @@
+{
+  "name": "parallax",
+  "description": "Docs for two readers, humans and agents, that always follow the code.",
+  "version": "0.1.0",
+  "author": { "name": "Luca Cazzola" },
+  "repository": "https://github.com/LuCazzola/parallax",
+  "homepage": "https://github.com/LuCazzola/parallax",
+  "license": "MIT",
+  "keywords": ["documentation", "docs", "mkdocs", "agents", "drift", "tickets"]
+}
