@@ -1,9 +1,12 @@
 ---
 name: dive
-description: Use when docs and code may agree on something wrong, when a docs sync wrote something that looks off or touched a design decision or new subsystem, or when asked whether the docs are healthy, in place, or need a whole-repo check.
+description: Use in a repo with a .parallax.toml when docs and code may agree on something wrong, when a docs sync wrote something that looks off or touched a design decision or new subsystem, or when asked whether the docs are healthy, in place, or need a whole-repo check.
 ---
 
 # Dive
+
+Only for a repo with `.parallax.toml` at its root; elsewhere this skill does not apply, so carry on
+normally. `docs/` below means the `docs_dir` set there.
 
 **The code is the oracle, docs follow, and neither implies correctness.** A dive asks two
 questions: do docs and code agree, and even if they do, does what they agree on look like
@@ -14,7 +17,7 @@ a bug? Dive changes nothing itself and never changes code.
 1. Pick the mode: **targeted** when a sync sent you here, **whole-repo** when asked about
    the docs overall or when `parallax:setup` is porting.
 2. Run `python3 docs/agent-guide/check_docs.py` and keep its output.
-3. Dispatch the `skeptic` subagent with the brief below. Done when it returns a verdict
+3. Dispatch the `parallax:skeptic` subagent with the brief below. Done when it returns a verdict
    block for every claim.
 4. Act on the verdicts:
 

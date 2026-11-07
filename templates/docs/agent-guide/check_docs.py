@@ -7,11 +7,14 @@ import sys
 import tomllib
 from pathlib import Path
 
-REPO = Path(__file__).resolve().parents[2]
+REPO = next(p for p in Path(__file__).resolve().parents if (p / ".parallax.toml").is_file())
 SKIP_DIRS = {"investigations", "superpowers"}
+NOT_SOURCE = {"site-packages", "node_modules", "venv", "__pycache__"}
+KNOWN_EXTENSIONS = {".py", ".md", ".toml", ".yml", ".yaml", ".json", ".sh", ".txt", ".js", ".ts",
+                    ".rs", ".go", ".c", ".h", ".cpp", ".ini", ".cfg", ".html", ".css"}
 NOT_A_PATH = re.compile(r"[\s<>*{}$]|://")
 EXTENSION = re.compile(r"\.[A-Za-z][A-Za-z0-9]*$")
-CODE_LINE = re.compile(r"^Code:\s")
+CODE_LINE = re.compile(r"^Code:\s+(.*)$")
 INLINE = re.compile(r"`([^`\n]+)`")
 
 
@@ -23,13 +26,26 @@ def load_config():
         sys.exit(print(f".parallax.toml: cannot read it: {e}") or 1)
 
 
+def is_ignored_dir(path):
+    return any(part.startswith(".") or part in NOT_SOURCE for part in path.parts)
+
+
+def repo_filenames():
+    return {p.name for p in REPO.rglob("*") if not is_ignored_dir(p.relative_to(REPO))}
+
+
 def looks_like_path(token):
-    """Only a token rooted at an existing top-level entry counts: `nowhere/b` is prose."""
+    """A known extension makes it a path; otherwise only a real top-level entry does, so
+    `nowhere/b` stays prose."""
     if NOT_A_PATH.search(token) or token.startswith(("/", "..", "~")):
         return False
-    if "/" not in token and not EXTENSION.search(token):
-        return False
-    return (REPO / token.removeprefix("./").split("/")[0]).exists()
+    if Path(token).suffix in KNOWN_EXTENSIONS:
+        return True
+    return "/" in token and (REPO / token.removeprefix("./").split("/")[0]).exists()
+
+
+def path_exists(token, roots, names):
+    return ("/" not in token and token in names) or any((root / token).exists() for root in roots)
 
 
 def page_lines(page):
@@ -41,21 +57,25 @@ def page_lines(page):
             yield number, line
 
 
-def check_page(page, rel, require_code_line):
+def check_page(page, rel, require_code_line, docs, names):
     problems, has_code_line = [], False
     for number, line in page_lines(page):
-        is_code_line = bool(CODE_LINE.match(line))
-        has_code_line |= is_code_line
-        for token in INLINE.findall(line):
-            if (is_code_line or looks_like_path(token)) and not (REPO / token).exists():
-                problems.append(f"{rel}:{number}: missing path {token}")
+        code_line = CODE_LINE.match(line)
+        if code_line:
+            has_code_line = True
+            tokens = [t.strip(" `") for t in code_line.group(1).split(",")]
+            problems += [f"{rel}:{number}: missing path {t}" for t in tokens if not (REPO / t).exists()]
+            continue
+        problems += [f"{rel}:{number}: missing path {t}" for t in INLINE.findall(line)
+                     if looks_like_path(t) and not path_exists(t, (REPO, docs, page.parent), names)]
     if require_code_line and not has_code_line:
         problems.append(f"{rel}:1: User Guide page has no Code: line")
     return problems
 
 
 def packages(root):
-    return {".".join(p.parent.relative_to(root).parts): p.parent for p in root.rglob("__init__.py")}
+    return {".".join(p.parent.relative_to(root).parts): p.parent for p in root.rglob("__init__.py")
+            if not is_ignored_dir(p.parent.relative_to(root))}
 
 
 def check_api_stubs(docs, cfg):
@@ -88,12 +108,14 @@ def main():
     cfg = load_config()
     docs = REPO / cfg.get("docs_dir", "docs")
     guide = docs / "user-guide"
+    names = repo_filenames()
     problems = []
     for page in sorted(docs.rglob("*.md")):
         if SKIP_DIRS & set(page.relative_to(docs).parts):
             continue
         rel = page.relative_to(REPO)
-        problems += check_page(page, rel, page.parent == guide and page.name != "index.md")
+        needs_code = page.is_relative_to(guide) and page.name != "index.md"
+        problems += check_page(page, rel, needs_code, docs, names)
     problems += check_api_stubs(docs, cfg)
     print("\n".join(problems) or "docs check passed")
     return 1 if problems else 0

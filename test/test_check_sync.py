@@ -139,6 +139,88 @@ class Hook(unittest.TestCase):
         self.write("src/b.py", "b = 2\n")
         self.assertTrue(self.run_hook("stop"))
 
+    def test_forward_branch_switch_is_silent(self):
+        self.git("checkout", "-q", "-b", "ahead")
+        self.write("src/b.py", "b = 1\n")
+        self.commit("ahead")
+        self.git("checkout", "-q", "main")
+        self.run_hook("session-start")
+        self.git("checkout", "-q", "ahead")
+        self.assertIsNone(self.run_hook("stop"))
+
+    def test_fast_forward_merge_is_silent(self):
+        self.git("checkout", "-q", "-b", "ahead")
+        self.write("src/b.py", "b = 1\n")
+        self.commit("ahead")
+        self.git("checkout", "-q", "main")
+        self.run_hook("session-start")
+        self.git("merge", "-q", "--ff-only", "ahead")
+        self.assertIsNone(self.run_hook("stop"))
+
+    def test_dirty_edit_during_branch_switch_is_seen(self):
+        self.git("checkout", "-q", "-b", "ahead")
+        self.write("src/b.py", "b = 1\n")
+        self.commit("ahead")
+        self.git("checkout", "-q", "main")
+        self.run_hook("session-start")
+        self.git("checkout", "-q", "ahead")
+        self.write("src/a.py", "a = 9\n")
+        self.assertIn("src/a.py", self.run_hook("stop"))
+
+    def test_amend_is_seen(self):
+        self.write("src/a.py", "a = 2\n")
+        self.commit("one")
+        self.run_hook("session-start")
+        self.write("src/a.py", "a = 3\n")
+        self.git("add", "-A")
+        self.git("commit", "-q", "--amend", "-m", "one")
+        self.assertIn("src/a.py", self.run_hook("stop"))
+
+    def test_soft_reset_and_recommit_is_seen(self):
+        self.write("src/a.py", "a = 2\n")
+        self.commit("one")
+        self.run_hook("session-start")
+        self.git("reset", "-q", "--soft", "HEAD~1")
+        self.write("src/a.py", "a = 3\n")
+        self.commit("two")
+        self.assertIn("src/a.py", self.run_hook("stop"))
+
+    def test_rebase_with_no_edits_is_silent(self):
+        self.git("checkout", "-q", "-b", "work")
+        self.write("src/b.py", "b = 1\n")
+        self.commit("work")
+        self.git("checkout", "-q", "main")
+        self.write("src/c.py", "c = 1\n")
+        self.commit("main")
+        self.git("checkout", "-q", "work")
+        self.run_hook("session-start")
+        self.git("rebase", "-q", "main")
+        self.assertIsNone(self.run_hook("stop"))
+
+    def test_reverting_a_synced_edit_is_seen(self):
+        self.run_hook("session-start")
+        self.write("src/a.py", "a = 2\n")
+        self.run_hook("stop")
+        self.git("checkout", "-q", "src/a.py")
+        self.assertIn("src/a.py", self.run_hook("stop"))
+
+    def test_mkdocs_and_readme_edits_are_not_code(self):
+        self.write("mkdocs.yml", "nav: []\n")
+        self.write("README.md", "# hi\n")
+        self.commit("config")
+        self.run_hook("session-start")
+        self.write("mkdocs.yml", "nav: [a]\n")
+        self.write("README.md", "# changed\n")
+        self.assertIsNone(self.run_hook("stop"))
+
+    def test_edit_during_sync_turn_is_not_reported_next_turn(self):
+        self.run_hook("session-start")
+        self.write("src/a.py", "a = 2\n")
+        self.run_hook("stop")
+        self.write("src/a.py", "a = 3\n")
+        self.run_hook("stop", active=True)
+        self.assertIsNone(self.run_hook("stop"))
+
     def test_subfolder_cwd_finds_marker(self):
         self.run_hook("session-start", cwd=self.repo / "src")
         self.write("src/a.py", "a = 2\n")

@@ -14,3 +14,6 @@ contradicts it; only the marked stub added to `CLAUDE.md`, and replacing its doc
 
 Second run: same fixture, answer abort. Pass: `git status` clean.
 Third run: re-run on the result. Pass: nothing changes outside the markers.
+
+Collisions: the fixture has its own `docs/index.md` and `mkdocs.yml`. Pass: both appear in the
+mapping, their content survives in the result, and the site name stays "Weather handbook".

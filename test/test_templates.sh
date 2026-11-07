@@ -7,8 +7,8 @@ cp -r "$HERE/templates/." "$TMP/"
 cd "$TMP"
 rm -f CLAUDE-stub.md
 find . -name __pycache__ -prune -exec rm -rf {} +
-grep -rlE '\{\{(site_name|repo_url|source_root)\}\}' . | xargs sed -i \
-  -e 's/{{site_name}}/Fixture/g' -e 's#{{repo_url}}#https://github.com/o/fixture#g' -e 's/{{source_root}}/src/g'
+grep -rlE '\{\{(site_name|repo_url|source_root|default_branch)\}\}' . | xargs sed -i \
+  -e 's/{{default_branch}}/trunk/g' -e 's/{{site_name}}/Fixture/g' -e 's#{{repo_url}}#https://github.com/o/fixture#g' -e 's/{{source_root}}/src/g'
 mkdir -p src/fixture docs/agent-guide/api/fixture docs/investigations
 printf '"""Fixture."""\n' > src/fixture/__init__.py
 printf 'def run() -> int:\n    """Run."""\n    return 1\n' > src/fixture/core.py
@@ -41,6 +41,8 @@ grep -q 'stylesheets/extra.css' site/index.html
 grep -q 'javascripts/mermaid.js' site/index.html
 grep -q 'mermaid-diagram' site/user-guide/core/index.html
 grep -q 'cssClass' site/user-guide/core/index.html
+grep -q 'branches: \[trunk\]' .github/workflows/docs.yml
+grep -q 'pull_request' .github/workflows/docs.yml
 python3 - <<'P'
 import tomllib, sys
 cfg = tomllib.load(open(".parallax.toml", "rb"))

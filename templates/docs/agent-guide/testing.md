@@ -12,6 +12,8 @@ This checks that the paths docs name exist, that each User Guide page has a `Cod
 and that API stubs match the packages. A pass means they match, not that what they say
 is right.
 
+Serve it locally by replacing `build --strict -d /tmp/site` below with `serve`.
+
 The site must also build with `--strict`, with the same pins as CI:
 
 ```bash

@@ -22,12 +22,14 @@ Parallax is a Claude Code plugin that makes those gaps visible and gives each on
 /plugin install parallax --marketplace LuCazzola/parallax
 ```
 
-On older Claude Code versions:
+If that form isn't available yet, use the two-step install:
 
 ```text
 /plugin marketplace add LuCazzola/parallax
 /plugin install parallax@parallax
 ```
+
+The automatic hook was tested on Claude Code 2.1.319.
 
 Then, in the repo you want to document:
 
@@ -58,7 +60,8 @@ that needs no AI, and ticket scripts that work without the plugin.
 | `parallax:ticket` | When something should be kept for later | Files an idea in the repo, or a GitHub issue. Asks first on public repos |
 
 `sync` fires through a hook: when an agent finishes a turn in which code changed, it is sent to
-sync once per change. Repos without a `.parallax.toml` never see any of this.
+sync once per change. Every skill except `setup` applies only to repos with a `.parallax.toml`, so
+othing changes anywhere else.
 
 ## What setup changes in your repo
 
@@ -72,23 +75,19 @@ Reasons the agent inferred are marked "Inferred, not confirmed" until you confir
 
 ## Hosting
 
-Setup asks. GitHub Actions is recommended; local (`docker compose`) and your own host also work.
+Setup asks. GitHub Actions is recommended; local (`docker compose -f docker-compose.docs.yml up`, or
+`uvx`) and your own host also work.
 On a private repo, Pages needs a paid plan, and the site is normally public unless you are on
 Enterprise, so setup warns you first.
 
 ## Requirements
 
 - Claude Code
-- Python 3.11+ and `git`
+- Python 3.11+ and `git` (below 3.11 the hook stays silent and the checks don't run)
 - `gh` for GitHub issues (without it you get the ideas table)
 - `uv` or Docker to build the site locally
 
 API reference generation is Python first; other languages are best effort.
-
-## Without the plugin
-
-Skill folders can be copied into `.claude/skills/`, but they lose the `parallax:` prefix and the
-automatic hook, so `sync` no longer runs by itself.
 
 ## Development
 

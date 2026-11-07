@@ -79,6 +79,13 @@ class Tickets(unittest.TestCase):
         out = self.run_script("open", "idea", "x", "pkg/a.py")
         self.assertEqual(out.returncode, 0, out.stderr)
 
+    def test_side_by_side_layout_finds_repo_root(self):
+        nested = self.repo / "parallax/docs/agent-guide"
+        nested.parent.mkdir(parents=True)
+        shutil.move(str(self.tickets.parent), str(nested))
+        self.tickets = nested / "tickets"
+        self.assertEqual(self.run_script("open", "idea", "x", "pkg/a.py").returncode, 0)
+
     def test_unknown_path_rejected(self):
         out = self.run_script("open", "idea", "x", "nope.py")
         self.assertNotEqual(out.returncode, 0)

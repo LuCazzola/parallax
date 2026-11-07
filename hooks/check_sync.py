@@ -14,6 +14,9 @@ from pathlib import Path
 MAX_NAMED = 20
 STALE_S = 24 * 3600
 DELETED = "deleted"
+NOT_CODE = {".parallax.toml", "CLAUDE.md", "AGENTS.md", "README.md", "mkdocs.yml"}
+# Whoever wrote these commits, the docs were not this agent's to follow.
+FOREIGN_MOVES = ("checkout:", "rebase", "pull", "merge")
 
 
 def git(root, *args, check=True):
@@ -40,7 +43,7 @@ def load_config(root):
 
 def is_code(path, cfg):
     docs = cfg.get("docs_dir", "docs").rstrip("/") + "/"
-    if path.startswith(docs) or path in (".parallax.toml", "CLAUDE.md"):
+    if path.startswith(docs) or path in NOT_CODE:
         return False
     return not any(fnmatch.fnmatch(path, g) or fnmatch.fnmatch(Path(path).name, g)
                    for g in cfg.get("ignore", []))
@@ -103,25 +106,31 @@ def reason(paths):
             "If nothing needs updating, say so and stop.")
 
 
+def last_move(root):
+    return git(root, "reflog", "-1", "--format=%gs", check=False).strip()
+
+
 def stop(data, root, cfg, state_file):
-    if data.get("stop_hook_active"):
-        return
     head = current_head(root)
     dirty = dirty_paths(root, cfg)
     worktree = {p: file_hash(root, p) for p in dirty}
+    if data.get("stop_hook_active"):
+        save_state(state_file, head, worktree)  # what sync did is not a new change
+        return
     if not state_file.is_file():
         save_state(state_file, head, worktree)
         return
     state = json.loads(state_file.read_text())
     seen = state["worktree"]
     old = state["head"]
-    if old and head != old and not is_ancestor(root, old, head):
-        save_state(state_file, head, worktree)  # branch switch or rebase: not this agent's change
-        return
     changed = {p for p, h in worktree.items() if seen.get(p) != h}
-    if head and head != old:
-        changed |= {p for p in committed_code_paths(root, old, head, cfg)
-                    if seen.get(p) != file_hash(root, p)}
+    moved = bool(head) and head != old
+    if not (moved and last_move(root).startswith(FOREIGN_MOVES)):
+        changed |= {p for p, h in seen.items() if p not in worktree and file_hash(root, p) != h}
+        if moved:
+            base = merge_base(root, old, head) if old else old
+            changed |= {p for p in committed_code_paths(root, base, head, cfg)
+                        if seen.get(p) != file_hash(root, p)}
     save_state(state_file, head, worktree)
     if changed:
         # Not {"decision": "block"}: that shows the user a "hook error".
@@ -129,9 +138,9 @@ def stop(data, root, cfg, state_file):
                                                  "additionalContext": reason(changed)}}))
 
 
-def is_ancestor(root, old, new):
-    return subprocess.run(["git", "-C", str(root), "merge-base", "--is-ancestor", old, new],
-                          capture_output=True).returncode == 0
+def merge_base(root, old, new):
+    """An amend or reset leaves `old` off `new`'s history: compare from where they split."""
+    return git(root, "merge-base", old, new).strip()
 
 
 def session_start(data, root, cfg, state_file):

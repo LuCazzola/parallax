@@ -1,9 +1,12 @@
 ---
 name: sync
-description: Use when code changed and docs may need to follow, when the Stop hook says to run parallax:sync, or when finishing a change in a repo with a .parallax.toml.
+description: Use in a repo with a .parallax.toml when code changed and docs may need to follow, when a hook says to run parallax:sync, or when finishing a change.
 ---
 
 # Sync
+
+Only for a repo with `.parallax.toml` at its root; elsewhere this skill does not apply, so carry on
+normally. `docs/` below means the `docs_dir` set there.
 
 **The code is the oracle, docs follow, and neither implies correctness.** Sync moves pages
 to what the code does now. It edits docs only, never code.
@@ -27,7 +30,8 @@ to what the code does now. It edits docs only, never code.
    ```
 
 5. Run `python3 docs/agent-guide/check_docs.py` and the strict build from
-   `docs/agent-guide/testing.md`, and fix what they report.
+   `docs/agent-guide/testing.md`. Fix what they report by editing docs: a missing path means the
+   page is wrong.
 6. Call `parallax:dive` when what you wrote looks wrong, when you are unsure you read the
    code correctly, or when the change touches a design decision or new subsystem.
 7. Report the pages changed, or "nothing to update" when no page stated anything about it.

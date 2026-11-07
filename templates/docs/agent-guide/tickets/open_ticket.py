@@ -14,7 +14,7 @@ import tomllib
 from pathlib import Path
 
 IDEAS = Path(__file__).with_name("ideas.md")
-REPO = Path(__file__).resolve().parents[3]
+REPO = next(p for p in Path(__file__).resolve().parents if (p / ".parallax.toml").is_file())
 ALPHABET = string.ascii_lowercase + string.digits
 ISSUE_TIERS = ["critical", "wanted", "minor"]
 TIERS = ISSUE_TIERS + ["idea"]

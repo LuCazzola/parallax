@@ -125,6 +125,48 @@ class CheckDocs(unittest.TestCase):
         self.write("mkdocs.yml", "nav:\n  - Home: index.md\n")
         self.assert_flags("agent-guide/api/pkg/index.md", "nav")
 
+    def test_renamed_top_folder_is_caught(self):
+        self.write("docs/index.md", "`src/pkg/core.py` and `lib_gone/pkg/core.py`\n")
+        self.assert_flags("lib_gone/pkg/core.py")
+
+    def test_missing_top_level_file_is_caught(self):
+        self.write("docs/index.md", "`missing_top.md`\n")
+        self.assert_flags("missing_top.md")
+
+    def test_bare_filename_found_elsewhere_passes(self):
+        self.write("docs/index.md", "`core.py`\n")
+        self.assert_clean()
+
+    def test_docs_relative_path_passes(self):
+        self.write("docs/index.md", "`agent-guide/check_docs.py`\n")
+        self.assert_clean()
+
+    def test_code_line_without_backticks_is_checked(self):
+        self.write("docs/user-guide/part.md", "# Part\n\nCode: src/nothing_here.py\n")
+        self.assert_flags("src/nothing_here.py")
+
+    def test_nested_user_guide_page_needs_code_line(self):
+        self.write("docs/user-guide/sub/part.md", "# Part\n")
+        self.assert_flags("docs/user-guide/sub/part.md", "Code:")
+
+    def test_side_by_side_layout_finds_repo_root(self):
+        self.write(".parallax.toml", 'docs_dir = "parallax/docs"\nsource_roots = ["src"]\n')
+        dest = self.repo / "parallax/docs/agent-guide/check_docs.py"
+        dest.parent.mkdir(parents=True)
+        shutil.copy(SCRIPT, dest)
+        self.write("parallax/docs/index.md", "`src/pkg/core.py` and `src/pkg/gone.py`\n")
+        out = subprocess.run([sys.executable, str(dest)], cwd=self.repo, capture_output=True, text=True)
+        self.assertEqual(out.returncode, 1, out.stdout + out.stderr)
+        self.assertIn("src/pkg/gone.py", out.stdout)
+
+    def test_flat_layout_skips_virtualenvs(self):
+        self.stubs()
+        self.write(".parallax.toml", 'source_roots = ["src", "."]\n')
+        self.write(".venv/lib/site-packages/foo/__init__.py", "")
+        self.write("venv/lib/site-packages/bar/__init__.py", "")
+        out = self.run_check()
+        self.assertNotIn("site-packages", out.stdout)
+
     def test_malformed_toml_reports_clearly(self):
         self.write(".parallax.toml", "= nonsense [\n")
         self.assert_flags(".parallax.toml")

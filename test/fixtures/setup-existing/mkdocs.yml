@@ -1,0 +1,5 @@
+site_name: Weather handbook
+nav:
+  - Home: index.md
+  - Overview: overview.md
+  - Add a sensor: howto/add-sensor.md
