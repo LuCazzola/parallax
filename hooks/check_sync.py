@@ -124,7 +124,9 @@ def stop(data, root, cfg, state_file):
                     if seen.get(p) != file_hash(root, p)}
     save_state(state_file, head, worktree)
     if changed:
-        print(json.dumps({"decision": "block", "reason": reason(changed)}))
+        # Not {"decision": "block"}: that shows the user a "hook error".
+        print(json.dumps({"hookSpecificOutput": {"hookEventName": "Stop",
+                                                 "additionalContext": reason(changed)}}))
 
 
 def is_ancestor(root, old, new):

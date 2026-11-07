@@ -46,7 +46,11 @@ class Hook(unittest.TestCase):
         out = subprocess.run([sys.executable, str(SCRIPT), event], input=payload, env=env,
                              capture_output=True, text=True)
         self.assertEqual(out.returncode, 0, out.stderr)
-        return json.loads(out.stdout) if out.stdout.strip() else None
+        if not out.stdout.strip():
+            return None
+        hook = json.loads(out.stdout)["hookSpecificOutput"]
+        self.assertEqual(hook["hookEventName"], "Stop")
+        return hook["additionalContext"]
 
     def test_no_marker_is_silent(self):
         (self.repo / ".parallax.toml").unlink()
@@ -62,9 +66,8 @@ class Hook(unittest.TestCase):
         self.run_hook("session-start")
         self.write("src/a.py", "a = 2\n")
         first = self.run_hook("stop")
-        self.assertEqual(first["decision"], "block")
-        self.assertIn("src/a.py", first["reason"])
-        self.assertIn("parallax:sync", first["reason"])
+        self.assertIn("src/a.py", first)
+        self.assertIn("parallax:sync", first)
         self.assertIsNone(self.run_hook("stop"))
 
     def test_second_edit_blocks_again(self):
@@ -72,7 +75,7 @@ class Hook(unittest.TestCase):
         self.write("src/a.py", "a = 2\n")
         self.run_hook("stop")
         self.write("src/a.py", "a = 3\n")
-        self.assertEqual(self.run_hook("stop")["decision"], "block")
+        self.assertTrue(self.run_hook("stop"))
 
     def test_stop_hook_active_is_silent(self):
         self.run_hook("session-start")
@@ -87,12 +90,12 @@ class Hook(unittest.TestCase):
     def test_edit_made_outside_any_tool_is_seen(self):
         self.run_hook("session-start")
         subprocess.run(["sh", "-c", "echo x > src/new.py"], cwd=self.repo, check=True)
-        self.assertIn("src/new.py", self.run_hook("stop")["reason"])
+        self.assertIn("src/new.py", self.run_hook("stop"))
 
     def test_deleted_file_blocks(self):
         self.run_hook("session-start")
         (self.repo / "src/a.py").unlink()
-        self.assertIn("src/a.py", self.run_hook("stop")["reason"])
+        self.assertIn("src/a.py", self.run_hook("stop"))
 
     def test_docs_only_change_is_silent(self):
         self.run_hook("session-start")
@@ -108,7 +111,7 @@ class Hook(unittest.TestCase):
         self.run_hook("session-start")
         self.write("src/a.py", "a = 2\n")
         self.commit("change")
-        self.assertIn("src/a.py", self.run_hook("stop")["reason"])
+        self.assertIn("src/a.py", self.run_hook("stop"))
 
     def test_commit_of_docs_only_is_silent(self):
         self.run_hook("session-start")
@@ -134,12 +137,12 @@ class Hook(unittest.TestCase):
         self.git("checkout", "-q", "other")
         self.assertIsNone(self.run_hook("stop"))
         self.write("src/b.py", "b = 2\n")
-        self.assertEqual(self.run_hook("stop")["decision"], "block")
+        self.assertTrue(self.run_hook("stop"))
 
     def test_subfolder_cwd_finds_marker(self):
         self.run_hook("session-start", cwd=self.repo / "src")
         self.write("src/a.py", "a = 2\n")
-        self.assertEqual(self.run_hook("stop", cwd=self.repo / "src")["decision"], "block")
+        self.assertTrue(self.run_hook("stop", cwd=self.repo / "src"))
 
     def test_repo_with_no_commits_does_not_crash(self):
         with tempfile.TemporaryDirectory() as empty:
@@ -147,13 +150,13 @@ class Hook(unittest.TestCase):
             Path(empty, ".parallax.toml").write_text('docs_dir = "docs"\n')
             self.run_hook("session-start", cwd=empty)
             Path(empty, "x.py").write_text("x\n")
-            self.assertIn("x.py", self.run_hook("stop", cwd=empty)["reason"])
+            self.assertIn("x.py", self.run_hook("stop", cwd=empty))
             self.assertIsNone(self.run_hook("stop", cwd=empty))
 
     def test_path_with_spaces_and_unicode_named_correctly(self):
         self.run_hook("session-start")
         self.write("src/my café file.py", "x\n")
-        self.assertIn("src/my café file.py", self.run_hook("stop")["reason"])
+        self.assertIn("src/my café file.py", self.run_hook("stop"))
 
     def test_malformed_toml_fails_open(self):
         (self.repo / ".parallax.toml").write_text("= nonsense [\n")
@@ -168,14 +171,14 @@ class Hook(unittest.TestCase):
         self.write("src/a.py", "a = 2\n")
         self.assertIsNone(self.run_hook("stop"))
         self.write("src/a.py", "a = 3\n")
-        self.assertEqual(self.run_hook("stop")["decision"], "block")
+        self.assertTrue(self.run_hook("stop"))
 
     def test_second_session_keeps_its_own_baseline(self):
         self.run_hook("session-start", session="a")
         self.write("src/a.py", "a = 2\n")
         self.run_hook("session-start", session="b")
         self.assertIsNone(self.run_hook("stop", session="b"))
-        self.assertEqual(self.run_hook("stop", session="a")["decision"], "block")
+        self.assertTrue(self.run_hook("stop", session="a"))
 
     def test_stale_session_files_removed(self):
         self.run_hook("session-start", session="old")
@@ -191,12 +194,12 @@ class Hook(unittest.TestCase):
         self.write("src/a.py", "a = 2\n")
         payload = json.dumps({"cwd": str(self.repo), "session_id": "s1", "source": "compact"})
         self.run_hook("session-start", stdin=payload)
-        self.assertEqual(self.run_hook("stop")["decision"], "block")
+        self.assertTrue(self.run_hook("stop"))
 
     def test_rename_names_both_paths(self):
         self.run_hook("session-start")
         self.git("mv", "src/a.py", "src/b.py")
-        reason = self.run_hook("stop")["reason"]
+        reason = self.run_hook("stop")
         self.assertIn("src/a.py", reason)
         self.assertIn("src/b.py", reason)
 
@@ -204,7 +207,7 @@ class Hook(unittest.TestCase):
         self.run_hook("session-start")
         for i in range(30):
             self.write(f"src/f{i}.py", "x\n")
-        reason = self.run_hook("stop")["reason"]
+        reason = self.run_hook("stop")
         self.assertLessEqual(sum(f"src/f{i}.py" in reason for i in range(30)), 20)
         self.assertIn("more", reason)
 
