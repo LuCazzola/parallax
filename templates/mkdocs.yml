@@ -1,0 +1,90 @@
+site_name: {{site_name}}
+repo_url: {{repo_url}}
+edit_uri: ""
+
+docs_dir: docs
+# Dated notes, agent plans and scripts stay in the repo, off the site.
+exclude_docs: |
+  investigations/
+  superpowers/
+  agent-guide/check_docs.py
+  agent-guide/tickets/*.py
+
+validation:
+  nav:
+    omitted_files: warn
+    not_found: warn
+  links:
+    not_found: warn
+    anchors: warn
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - content.code.copy
+    - search.highlight
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle: {icon: material/weather-night, name: Dark mode}
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle: {icon: material/weather-sunny, name: Light mode}
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid-diagram  # rendered by docs/javascripts/mermaid.js, not Material
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+
+plugins:
+  - search
+  - autorefs
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [{{source_root}}]
+          options:
+            allow_inspection: false  # static analysis only: never import the code
+            docstring_style: google
+            show_source: false
+            show_if_no_docstring: true
+            show_root_heading: true
+            show_root_full_path: false
+            heading_level: 2
+            members_order: source
+            show_signature_annotations: true
+            separate_signature: true
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - path: javascripts/mermaid.js
+    type: module
+
+nav:
+  - Home: index.md
+  - User Guide:
+      - user-guide/index.md
+  - Agent Guide:
+      - agent-guide/index.md
+      - Map: agent-guide/map.md
+      - Recipes: agent-guide/recipes.md
+      - Testing: agent-guide/testing.md
+      - Glossary: agent-guide/glossary.md
+      - Issues & Ideas: agent-guide/tickets/ideas.md
