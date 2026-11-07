@@ -1,0 +1,2 @@
+docs_dir = "docs"
+source_roots = ["src"]
