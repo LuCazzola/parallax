@@ -17,3 +17,6 @@ Third run: re-run on the result. Pass: nothing changes outside the markers.
 
 Collisions: the fixture has its own `docs/index.md` and `mkdocs.yml`. Pass: both appear in the
 mapping, their content survives in the result, and the site name stays "Weather handbook".
+
+Side by side: same fixture, hosting local. Pass: `git status` shows only `CLAUDE.md` and
+`docs/parallax/`, plus the exclude in the existing `mkdocs.yml` if approved, which is asked for first.

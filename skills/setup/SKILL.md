@@ -31,6 +31,9 @@ Ask all of these in one message, and wait for the answers.
 
 On abort, stop with the working tree unchanged.
 
+For side by side, if the existing site builds from `docs/`, it will also publish `docs/parallax/`.
+Name the one-line exclude its config needs, and ask to add it. It is the only change to that site.
+
 ## 3. Show the mapping
 
 Port only. If existing docs have uncommitted changes, ask the user to commit them first, so nothing
@@ -42,14 +45,13 @@ here can lose them. Then present a table of every current page and where it goes
 Everything Parallax builds lives in `docs/parallax/`. Two things must live outside it: the workflow
 in `.github/workflows/`, and the stub in `CLAUDE.md`.
 
-1. Copy `templates/docs/parallax/` into the repo. Fill `{{site_name}}`, `{{repo_url}}` (drop the line
-   if there is no remote), `{{source_root}}`. Set `ignore` in `docs/parallax/parallax.toml` to the
+1. Copy `templates/docs/parallax/` into the repo. Fill `{{site_name}}` (the existing site's name, if
+   there is one), `{{repo_url}}` (drop the line if there is no remote), `{{source_root}}`. Set `ignore` in `docs/parallax/parallax.toml` to the
    generated files you found.
 2. Hosting: Actions copies `templates/.github/workflows/docs.yml`, filling `{{default_branch}}`; if
-   that file exists, ask for another name rather than replacing it. Local keeps
-   `docs/parallax/docker-compose.yml` if the repo uses Docker, otherwise deletes it and relies on the
-   `uvx` serve command in `testing.md`. Elsewhere deletes it, and `testing.md` records the target
-   and the build command.
+   that file exists, ask for another name rather than replacing it. Local relies on the `uvx` serve
+   command in `testing.md`. Elsewhere records the target and the build command in `testing.md`.
+   Delete `docs/parallax/docker-compose.yml` unless the hosting is local and the repo uses Docker.
 3. Python: add one `docs/parallax/pages/agent-guide/api/<package/as/path>/index.md` per package, with
    a `::: <package>` block per module, and list each in the nav. Other languages: use a generator
    if one fits, otherwise remove `mkdocstrings` and rely on the map.
