@@ -7,8 +7,9 @@ import sys
 import tomllib
 from pathlib import Path
 
-REPO = next(p for p in Path(__file__).resolve().parents if (p / ".parallax.toml").is_file())
-SKIP_DIRS = {"investigations", "superpowers"}
+PARALLAX = Path(__file__).resolve().parents[1]
+REPO = PARALLAX.parents[1]
+PAGES = PARALLAX / "pages"
 NOT_SOURCE = {"site-packages", "node_modules", "venv", "__pycache__"}
 KNOWN_EXTENSIONS = {".py", ".md", ".toml", ".yml", ".yaml", ".json", ".sh", ".txt", ".js", ".ts",
                     ".rs", ".go", ".c", ".h", ".cpp", ".ini", ".cfg", ".html", ".css"}
@@ -20,10 +21,10 @@ INLINE = re.compile(r"`([^`\n]+)`")
 
 def load_config():
     try:
-        with (REPO / ".parallax.toml").open("rb") as f:
+        with (PARALLAX / "parallax.toml").open("rb") as f:
             return tomllib.load(f)
     except (OSError, tomllib.TOMLDecodeError) as e:
-        sys.exit(print(f".parallax.toml: cannot read it: {e}") or 1)
+        sys.exit(print(f"parallax.toml: cannot read it: {e}") or 1)
 
 
 def is_ignored_dir(path):
@@ -57,7 +58,7 @@ def page_lines(page):
             yield number, line
 
 
-def check_page(page, rel, require_code_line, docs, names):
+def check_page(page, rel, require_code_line, names):
     problems, has_code_line = [], False
     for number, line in page_lines(page):
         code_line = CODE_LINE.match(line)
@@ -67,7 +68,7 @@ def check_page(page, rel, require_code_line, docs, names):
             problems += [f"{rel}:{number}: missing path {t}" for t in tokens if not (REPO / t).exists()]
             continue
         problems += [f"{rel}:{number}: missing path {t}" for t in INLINE.findall(line)
-                     if looks_like_path(t) and not path_exists(t, (REPO, docs, page.parent), names)]
+                     if looks_like_path(t) and not path_exists(t, (REPO, PAGES, page.parent), names)]
     if require_code_line and not has_code_line:
         problems.append(f"{rel}:1: User Guide page has no Code: line")
     return problems
@@ -78,8 +79,8 @@ def packages(root):
             if not is_ignored_dir(p.parent.relative_to(root))}
 
 
-def check_api_stubs(docs, cfg):
-    api = docs / "agent-guide" / "api"
+def check_api_stubs(cfg):
+    api = PAGES / "agent-guide" / "api"
     if not api.is_dir():
         return []
     problems, found = [], {}
@@ -94,9 +95,9 @@ def check_api_stubs(docs, cfg):
         wanted = [name] + [f"{name}.{m.stem}" for m in path.glob("*.py") if m.name != "__init__.py"]
         problems += [f"{stub.relative_to(REPO)}: stub skips {w}" for w in wanted if f"::: {w}\n" not in text]
     stubs = {stub for _, stub in found.values()}
-    nav = (REPO / "mkdocs.yml").read_text()
+    nav = (PARALLAX / "mkdocs.yml").read_text()
     for stub in api.rglob("*.md"):
-        rel = stub.relative_to(docs)
+        rel = stub.relative_to(PAGES)
         if stub not in stubs:
             problems.append(f"{rel}: stub for a package that no longer exists")
         if str(rel) not in nav:
@@ -106,17 +107,14 @@ def check_api_stubs(docs, cfg):
 
 def main():
     cfg = load_config()
-    docs = REPO / cfg.get("docs_dir", "docs")
-    guide = docs / "user-guide"
+    guide = PAGES / "user-guide"
     names = repo_filenames()
     problems = []
-    for page in sorted(docs.rglob("*.md")):
-        if SKIP_DIRS & set(page.relative_to(docs).parts):
-            continue
+    for page in sorted(PAGES.rglob("*.md")):
         rel = page.relative_to(REPO)
         needs_code = page.is_relative_to(guide) and page.name != "index.md"
-        problems += check_page(page, rel, needs_code, docs, names)
-    problems += check_api_stubs(docs, cfg)
+        problems += check_page(page, rel, needs_code, names)
+    problems += check_api_stubs(cfg)
     print("\n".join(problems) or "docs check passed")
     return 1 if problems else 0
 

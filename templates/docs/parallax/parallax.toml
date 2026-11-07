@@ -1,4 +1,3 @@
-docs_dir = "docs"
 source_roots = ["{{source_root}}"]   # where packages live, for ticket paths and API stubs
 ignore = ["*.log", "*.lock"]         # generated files: these do not count as code for the sync hook
 

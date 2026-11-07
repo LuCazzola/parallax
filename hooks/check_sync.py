@@ -14,7 +14,8 @@ from pathlib import Path
 MAX_NAMED = 20
 STALE_S = 24 * 3600
 DELETED = "deleted"
-NOT_CODE = {".parallax.toml", "CLAUDE.md", "AGENTS.md", "README.md", "mkdocs.yml"}
+MARKER = "docs/parallax/parallax.toml"
+NOT_CODE = {"CLAUDE.md", "AGENTS.md", "README.md", "mkdocs.yml"}
 # Whoever wrote these commits, the docs were not this agent's to follow.
 FOREIGN_MOVES = ("checkout:", "rebase", "pull", "merge")
 
@@ -34,7 +35,7 @@ def toplevel(cwd):
 def load_config(root):
     import tomllib  # inside main's try: older Pythons fail open
 
-    marker = Path(root, ".parallax.toml")
+    marker = Path(root, MARKER)
     if not marker.is_file():
         return None
     with marker.open("rb") as f:
@@ -42,8 +43,7 @@ def load_config(root):
 
 
 def is_code(path, cfg):
-    docs = cfg.get("docs_dir", "docs").rstrip("/") + "/"
-    if path.startswith(docs) or path in NOT_CODE:
+    if path.startswith("docs/") or path in NOT_CODE:
         return False
     return not any(fnmatch.fnmatch(path, g) or fnmatch.fnmatch(Path(path).name, g)
                    for g in cfg.get("ignore", []))

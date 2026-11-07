@@ -1,12 +1,12 @@
 ---
 name: gap
-description: Use in a repo with a .parallax.toml when someone's picture of the system differs from the docs or code, such as "that's not how I thought this worked", "I imagined X", "why does it do Y", or a surprising result or doubtful design.
+description: Use in a repo with docs/parallax/parallax.toml when someone's picture of the system differs from the docs or code, such as "that's not how I thought this worked", "I imagined X", "why does it do Y", or a surprising result or doubtful design.
 ---
 
 # Gap
 
-Only for a repo with `.parallax.toml` at its root; elsewhere this skill does not apply, so carry on
-normally. `docs/` below means the `docs_dir` set there.
+Only for a repo with `docs/parallax/parallax.toml`; elsewhere this skill does not apply, so carry
+on normally.
 
 The person's picture differs from the docs or code. **The code is the oracle for what happens,
 and neither implies correctness.** The picture is evidence, so find out what the gap means.

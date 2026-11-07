@@ -23,7 +23,7 @@ class Hook(unittest.TestCase):
         self.git("config", "user.name", "t")
         self.write("src/a.py", "a = 1\n")
         self.write("docs/index.md", "# hi\n")
-        self.write(".parallax.toml", 'docs_dir = "docs"\nignore = ["*.lock"]\n')
+        self.write("docs/parallax/parallax.toml", 'ignore = ["*.lock"]\n')
         self.commit("init")
 
     def git(self, *args, cwd=None):
@@ -53,7 +53,7 @@ class Hook(unittest.TestCase):
         return hook["additionalContext"]
 
     def test_no_marker_is_silent(self):
-        (self.repo / ".parallax.toml").unlink()
+        (self.repo / "docs/parallax/parallax.toml").unlink()
         self.run_hook("session-start")
         self.write("src/a.py", "a = 2\n")
         self.assertIsNone(self.run_hook("stop"))
@@ -229,7 +229,8 @@ class Hook(unittest.TestCase):
     def test_repo_with_no_commits_does_not_crash(self):
         with tempfile.TemporaryDirectory() as empty:
             self.git("init", "-q", cwd=empty)
-            Path(empty, ".parallax.toml").write_text('docs_dir = "docs"\n')
+            Path(empty, "docs/parallax").mkdir(parents=True)
+            Path(empty, "docs/parallax/parallax.toml").write_text("")
             self.run_hook("session-start", cwd=empty)
             Path(empty, "x.py").write_text("x\n")
             self.assertIn("x.py", self.run_hook("stop", cwd=empty))
@@ -241,7 +242,7 @@ class Hook(unittest.TestCase):
         self.assertIn("src/my café file.py", self.run_hook("stop"))
 
     def test_malformed_toml_fails_open(self):
-        (self.repo / ".parallax.toml").write_text("= nonsense [\n")
+        (self.repo / "docs/parallax/parallax.toml").write_text("= nonsense [\n")
         self.run_hook("session-start")
         self.write("src/a.py", "a = 2\n")
         self.assertIsNone(self.run_hook("stop"))

@@ -64,23 +64,24 @@ that needs no AI, and ticket scripts that work without the plugin.
 | `parallax:ticket` | When something should be kept for later | Files an idea in the repo, or a GitHub issue. Asks first on public repos |
 
 `sync` fires through a hook: when an agent finishes a turn in which code changed, it is sent to
-sync once per change. Every skill except `setup` applies only to repos with a `.parallax.toml`, so
-othing changes anywhere else.
+sync once per change. Every skill except `setup` applies only to repos with `docs/parallax/parallax.toml`,
+so nothing changes anywhere else.
 
 ## What setup changes in your repo
 
-- `docs/`, split into `user-guide/` and `agent-guide/`
-- `mkdocs.yml`, `.parallax.toml`
+Everything Parallax builds lives in `docs/parallax/`: the pages, the site config, the scripts and the
+settings. Your repo root stays as it was. Only three things sit outside that folder:
+
 - A short block in `CLAUDE.md`, between `parallax` markers, so agents without the plugin get the rule
-- A publishing workflow or Docker setup, depending on what you choose
+- `.github/workflows/docs.yml`, if you host with GitHub Actions
 - GitHub labels for tickets
 
 Reasons the agent inferred are marked "Inferred, not confirmed" until you confirm them.
 
 ## Hosting
 
-Setup asks. GitHub Actions is recommended; local (`docker compose -f docker-compose.docs.yml up`, or
-`uvx`) and your own host also work.
+Setup asks. GitHub Actions is recommended; local (`uvx`, or `docker compose -f
+docs/parallax/docker-compose.yml up` if your repo uses Docker) and your own host also work.
 On a private repo, Pages needs a paid plan, and the site is normally public unless you are on
 Enterprise, so setup warns you first.
 
@@ -89,7 +90,7 @@ Enterprise, so setup warns you first.
 - Claude Code
 - Python 3.11+ and `git` (below 3.11 the hook stays silent and the checks don't run)
 - `gh` for GitHub issues (without it you get the ideas table)
-- `uv` or Docker to build the site locally
+- `uv` to build the site locally (optional; Docker is never required)
 
 API reference generation is Python first; other languages are best effort.
 
@@ -97,7 +98,7 @@ API reference generation is Python first; other languages are best effort.
 
 ```bash
 python3 -m unittest discover -s test
-bash test/test_templates.sh          # needs Docker
+bash test/test_templates.sh          # needs Docker, for this repo's tests only
 ```
 
 `test/scenarios/` holds the pressure scenarios used to prove each skill against a baseline.

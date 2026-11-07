@@ -9,7 +9,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-TEMPLATES = Path(__file__).resolve().parents[1] / "templates/docs/agent-guide/tickets"
+TEMPLATES = Path(__file__).resolve().parents[1] / "templates/docs/parallax"
 FAKE_GH = """#!/bin/sh
 printf '%s\\n' "$*" >> "$GH_LOG"
 case "$1 $2" in
@@ -25,10 +25,9 @@ class Tickets(unittest.TestCase):
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         self.repo = Path(tmp.name) / "repo"
-        self.tickets = self.repo / "docs/agent-guide/tickets"
-        self.tickets.parent.mkdir(parents=True)
-        shutil.copytree(TEMPLATES, self.tickets, ignore=shutil.ignore_patterns("__pycache__"))
-        (self.repo / ".parallax.toml").write_text('source_roots = ["src"]\n')
+        self.parallax = self.repo / "docs/parallax"
+        shutil.copytree(TEMPLATES, self.parallax, ignore=shutil.ignore_patterns("__pycache__"))
+        (self.parallax / "parallax.toml").write_text('source_roots = ["src"]\n')
         (self.repo / "src/pkg").mkdir(parents=True)
         (self.repo / "src/pkg/a.py").write_text("")
         (self.repo / "top.py").write_text("")
@@ -43,14 +42,14 @@ class Tickets(unittest.TestCase):
                     "GH_VIEW": str(self.view)}
 
     def run_script(self, name, *args, **env):
-        return subprocess.run([sys.executable, str(self.tickets / f"{name}_ticket.py"), *args],
+        return subprocess.run([sys.executable, str(self.parallax / "tools" / f"{name}_ticket.py"), *args],
                               cwd=self.repo, env={**self.env, **env}, capture_output=True, text=True)
 
     def calls(self):
         return self.log.read_text() if self.log.exists() else ""
 
     def ideas(self):
-        return (self.tickets / "ideas.md").read_text()
+        return (self.parallax / "pages/agent-guide/ideas.md").read_text()
 
     def open_idea(self):
         out = self.run_script("open", "idea", "try x", "top.py")
@@ -78,13 +77,6 @@ class Tickets(unittest.TestCase):
     def test_where_path_resolves_through_source_roots(self):
         out = self.run_script("open", "idea", "x", "pkg/a.py")
         self.assertEqual(out.returncode, 0, out.stderr)
-
-    def test_side_by_side_layout_finds_repo_root(self):
-        nested = self.repo / "parallax/docs/agent-guide"
-        nested.parent.mkdir(parents=True)
-        shutil.move(str(self.tickets.parent), str(nested))
-        self.tickets = nested / "tickets"
-        self.assertEqual(self.run_script("open", "idea", "x", "pkg/a.py").returncode, 0)
 
     def test_unknown_path_rejected(self):
         out = self.run_script("open", "idea", "x", "nope.py")

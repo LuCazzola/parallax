@@ -2,13 +2,7 @@ site_name: {{site_name}}
 repo_url: {{repo_url}}
 edit_uri: ""
 
-docs_dir: docs
-# Dated notes, agent plans and scripts stay in the repo, off the site.
-exclude_docs: |
-  investigations/
-  superpowers/
-  agent-guide/check_docs.py
-  agent-guide/tickets/*.py
+docs_dir: pages
 
 validation:
   nav:
@@ -45,7 +39,7 @@ markdown_extensions:
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
-          class: mermaid-diagram  # rendered by docs/javascripts/mermaid.js, not Material
+          class: mermaid-diagram  # rendered by pages/javascripts/mermaid.js, not Material
           format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.highlight
   - pymdownx.inlinehilite
@@ -57,7 +51,7 @@ plugins:
       default_handler: python
       handlers:
         python:
-          paths: [{{source_root}}]
+          paths: [../../{{source_root}}]
           options:
             allow_inspection: false  # static analysis only: never import the code
             docstring_style: google
@@ -87,4 +81,4 @@ nav:
       - Recipes: agent-guide/recipes.md
       - Testing: agent-guide/testing.md
       - Glossary: agent-guide/glossary.md
-      - Issues & Ideas: agent-guide/tickets/ideas.md
+      - Issues & Ideas: agent-guide/ideas.md

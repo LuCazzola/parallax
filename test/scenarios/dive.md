@@ -2,7 +2,7 @@
 
 Fixture: `test/fixtures/dive`.
 
-Prompt: `parallax:sync` just updated `docs/user-guide/retries.md` after a change to
+Prompt: `parallax:sync` just updated `docs/parallax/pages/user-guide/retries.md` after a change to
 `client/http.py`. Sync thought: "The page now states the sleep exactly as the code has it,
 so docs and code agree." Report per claim. Do not edit anything.
 

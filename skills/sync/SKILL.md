@@ -1,12 +1,12 @@
 ---
 name: sync
-description: Use in a repo with a .parallax.toml when code changed and docs may need to follow, when a hook says to run parallax:sync, or when finishing a change.
+description: Use in a repo with docs/parallax/parallax.toml when code changed and docs may need to follow, when a hook says to run parallax:sync, or when finishing a change.
 ---
 
 # Sync
 
-Only for a repo with `.parallax.toml` at its root; elsewhere this skill does not apply, so carry on
-normally. `docs/` below means the `docs_dir` set there.
+Only for a repo with `docs/parallax/parallax.toml`; elsewhere this skill does not apply, so carry
+on normally.
 
 **The code is the oracle, docs follow, and neither implies correctness.** Sync moves pages
 to what the code does now. It edits docs only, never code.
@@ -14,12 +14,12 @@ to what the code does now. It edits docs only, never code.
 ## Steps
 
 1. Read the change: `git status` and `git diff`, plus any commits made this turn.
-2. Find the pages that state something about it: grep `docs/` for each changed path (User
+2. Find the pages that state something about it: grep `docs/parallax/pages/` for each changed path (User
    Guide pages list theirs on the `Code:` line) and for the names, flags, defaults, config
    keys and formats that changed. Include `CLAUDE.md`. Done when every changed thing has
    been searched for.
 3. Edit each stale statement to what the code does now, in the smallest edit, leaving the
-   surrounding prose as it is. Update `docs/agent-guide/map.md` when files moved.
+   surrounding prose as it is. Update `docs/parallax/pages/agent-guide/map.md` when files moved.
 4. Add a page or section only when the change introduces a new subsystem or design decision.
    Place it by meaning (below). A reason the user gave you counts as confirmed; a reason you
    inferred gets the mark:
@@ -29,8 +29,8 @@ to what the code does now. It edits docs only, never code.
        <the reason>
    ```
 
-5. Run `python3 docs/agent-guide/check_docs.py` and the strict build from
-   `docs/agent-guide/testing.md`. Fix what they report by editing docs: a missing path means the
+5. Run `python3 docs/parallax/tools/check_docs.py` and the strict build from
+   `docs/parallax/pages/agent-guide/testing.md`. Fix what they report by editing docs: a missing path means the
    page is wrong.
 6. Call `parallax:dive` when what you wrote looks wrong, when you are unsure you read the
    code correctly, or when the change touches a design decision or new subsystem.

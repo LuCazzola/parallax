@@ -9,12 +9,13 @@ rm -f CLAUDE-stub.md
 find . -name __pycache__ -prune -exec rm -rf {} +
 grep -rlE '\{\{(site_name|repo_url|source_root|default_branch)\}\}' . | xargs sed -i \
   -e 's/{{default_branch}}/trunk/g' -e 's/{{site_name}}/Fixture/g' -e 's#{{repo_url}}#https://github.com/o/fixture#g' -e 's/{{source_root}}/src/g'
-mkdir -p src/fixture docs/agent-guide/api/fixture docs/investigations
+D=docs/parallax; PG=$D/pages
+mkdir -p src/fixture $PG/agent-guide/api/fixture docs/parallax/notes
 printf '"""Fixture."""\n' > src/fixture/__init__.py
 printf 'def run() -> int:\n    """Run."""\n    return 1\n' > src/fixture/core.py
-printf '::: fixture\n\n::: fixture.core\n' > docs/agent-guide/api/fixture/index.md
-printf '# Note\n' > docs/investigations/note.md
-cat > docs/user-guide/core.md <<'P'
+printf '::: fixture\n\n::: fixture.core\n' > $PG/agent-guide/api/fixture/index.md
+printf '# Note\n' > $D/notes/note.md
+cat > $PG/user-guide/core.md <<'P'
 # Core
 
 Code: `src/fixture/core.py`
@@ -25,18 +26,20 @@ classDiagram
     cssClass "Run" impl
 ```
 P
-sed -i 's#      - user-guide/index.md#      - user-guide/index.md\n      - Core: user-guide/core.md#' mkdocs.yml
-sed -i 's#      - Glossary: agent-guide/glossary.md#      - Glossary: agent-guide/glossary.md\n      - API: agent-guide/api/fixture/index.md#' mkdocs.yml
-python3 docs/agent-guide/check_docs.py
+sed -i 's#      - user-guide/index.md#      - user-guide/index.md\n      - Core: user-guide/core.md#' $D/mkdocs.yml
+sed -i 's#      - Glossary: agent-guide/glossary.md#      - Glossary: agent-guide/glossary.md\n      - API: agent-guide/api/fixture/index.md#' $D/mkdocs.yml
+python3 $D/tools/check_docs.py
 docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp -e NO_MKDOCS_2_WARNING=1 -v "$TMP:/repo" -w /repo \
   ghcr.io/astral-sh/uv:0.9.30-python3.12-bookworm-slim \
   uvx --with mkdocs-material==9.7.7 --with mkdocstrings==1.0.6 --with mkdocstrings-python==2.0.9 \
   --with griffe==2.3.0 --with mkdocs-autorefs==1.4.4 --with pymdown-extensions==11.0.2 \
-  mkdocs==1.6.1 build --strict -d site
+  mkdocs==1.6.1 build --strict -f docs/parallax/mkdocs.yml -d /repo/site
 test -f site/agent-guide/index.html
 test -f site/agent-guide/api/fixture/index.html
-test ! -e site/investigations
-test ! -e site/agent-guide/check_docs.py
+test ! -e site/notes
+test ! -e site/tools
+test -z "$(find . -maxdepth 1 -type f)"
+test "$(ls -A | LC_ALL=C sort | tr '\n' ' ')" = ".github docs site src "
 grep -q 'stylesheets/extra.css' site/index.html
 grep -q 'javascripts/mermaid.js' site/index.html
 grep -q 'mermaid-diagram' site/user-guide/core/index.html
@@ -45,7 +48,7 @@ grep -q 'branches: \[trunk\]' .github/workflows/docs.yml
 grep -q 'pull_request' .github/workflows/docs.yml
 python3 - <<'P'
 import tomllib, sys
-cfg = tomllib.load(open(".parallax.toml", "rb"))
+cfg = tomllib.load(open("docs/parallax/parallax.toml", "rb"))
 assert cfg["tickets"]["auto_file_issues"] == "private"
 P
 echo "templates ok"

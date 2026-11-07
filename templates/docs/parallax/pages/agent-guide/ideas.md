@@ -15,14 +15,14 @@ how a mismatch between the docs, the code and what someone expected gets kept.
 Open, edit and close tickets only with these scripts, run where `gh` is logged in:
 
 ```bash
-python3 docs/agent-guide/tickets/open_ticket.py <critical|wanted|minor|idea> "<issue>" <path> [<path> ...] \
+python3 docs/parallax/tools/open_ticket.py <critical|wanted|minor|idea> "<issue>" <path> [<path> ...] \
     [--title "<title>"] [--repro "<command>"] [--cause "<guess>"]
-python3 docs/agent-guide/tickets/edit_ticket.py <ID|#N> [--tier <tier>] [--issue "<issue>"] [--where <path> ...] \
+python3 docs/parallax/tools/edit_ticket.py <ID|#N> [--tier <tier>] [--issue "<issue>"] [--where <path> ...] \
     [--repro "<command>"] [--cause "<guess>"] [--verified "<evidence>"]
-python3 docs/agent-guide/tickets/close_ticket.py <ID|#N> [...] [--reason "not planned"] [--comment "<why>"]  # --comment required for issues
+python3 docs/parallax/tools/close_ticket.py <ID|#N> [...] [--reason "not planned"] [--comment "<why>"]  # --comment required for issues
 ```
 
-- An idea gets a 4-character ID (`grep <ID> docs/agent-guide/tickets/ideas.md`), an
+- An idea gets a 4-character ID (`grep <ID> docs/parallax/pages/agent-guide/ideas.md`), an
   issue a number (`gh issue view <N>`).
 - An issue keeps apart what was **Observed** (`<issue>`: facts only), how to
   **Reproduce** it (`--repro`: a command) and the **Suspected cause** (`--cause`),

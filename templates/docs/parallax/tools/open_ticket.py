@@ -13,8 +13,9 @@ import subprocess
 import tomllib
 from pathlib import Path
 
-IDEAS = Path(__file__).with_name("ideas.md")
-REPO = next(p for p in Path(__file__).resolve().parents if (p / ".parallax.toml").is_file())
+PARALLAX = Path(__file__).resolve().parents[1]
+REPO = PARALLAX.parents[1]
+IDEAS = PARALLAX / "pages/agent-guide/ideas.md"
 ALPHABET = string.ascii_lowercase + string.digits
 ISSUE_TIERS = ["critical", "wanted", "minor"]
 TIERS = ISSUE_TIERS + ["idea"]
@@ -24,7 +25,7 @@ LEAD_NOTE = ("> **Lead, not fact.** This is what was believed when it was writte
 
 
 def path_roots() -> list[Path]:
-    with (REPO / ".parallax.toml").open("rb") as f:
+    with (PARALLAX / "parallax.toml").open("rb") as f:
         return [REPO] + [REPO / root for root in tomllib.load(f).get("source_roots", [])]
 
 
