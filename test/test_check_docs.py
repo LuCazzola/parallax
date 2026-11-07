@@ -1,0 +1,134 @@
+"""Runs the shipped docs check on throwaway repos."""
+import shutil
+import subprocess
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+SCRIPT = Path(__file__).resolve().parents[1] / "templates/docs/agent-guide/check_docs.py"
+
+
+class CheckDocs(unittest.TestCase):
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.repo = Path(tmp.name)
+        self.write(".parallax.toml", 'docs_dir = "docs"\nsource_roots = ["src"]\n')
+        self.write("mkdocs.yml", "nav:\n  - Home: index.md\n")
+        self.write("src/pkg/__init__.py", "")
+        self.write("src/pkg/core.py", "x = 1\n")
+        self.write("docs/index.md", "# Home\n\nSee `src/pkg/core.py`.\n")
+        dest = self.repo / "docs/agent-guide/check_docs.py"
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(SCRIPT, dest)
+
+    def write(self, rel, text):
+        path = self.repo / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text)
+
+    def run_check(self):
+        return subprocess.run([sys.executable, "docs/agent-guide/check_docs.py"], cwd=self.repo,
+                              capture_output=True, text=True)
+
+    def assert_clean(self):
+        out = self.run_check()
+        self.assertEqual(out.returncode, 0, out.stdout + out.stderr)
+
+    def assert_flags(self, *needles):
+        out = self.run_check()
+        self.assertEqual(out.returncode, 1, out.stdout + out.stderr)
+        for needle in needles:
+            self.assertIn(needle, out.stdout)
+
+    def test_clean_repo_passes(self):
+        self.assert_clean()
+
+    def test_missing_backticked_path_fails_with_location(self):
+        self.write("docs/index.md", "# Home\n\nline\nSee `src/pkg/gone.py`.\n")
+        self.assert_flags("docs/index.md:4", "src/pkg/gone.py")
+
+    def test_root_level_file_with_extension_is_checked(self):
+        self.write("real.toml", "")
+        self.write("docs/index.md", "`real.toml`\n")
+        self.assert_clean()
+
+    def test_paths_in_fenced_blocks_ignored(self):
+        self.write("docs/index.md", "```\n`src/pkg/gone.py`\n```\n")
+        self.assert_clean()
+
+    def test_non_paths_ignored(self):
+        self.write("docs/index.md",
+                   "`<path>` `src/*.py` `https://x.y/z` `nowhere/b` `$HOME/x` `a b/c` `v1.2` `x.y`\n")
+        self.assert_clean()
+
+    def test_paths_outside_the_repo_ignored(self):
+        self.write("docs/index.md", "`/usr/bin/nope` `../other/nope.py` `~/nope.py`\n")
+        self.assert_clean()
+
+    def test_dotfile_at_root_is_checked(self):
+        self.write("docs/index.md", "`.github/workflows/gone.yml`\n")
+        self.write(".github/workflows/real.yml", "")
+        self.assert_flags("gone.yml")
+
+    def test_excluded_dirs_skipped(self):
+        self.write("docs/investigations/n.md", "`src/pkg/gone.py`\n")
+        self.write("docs/superpowers/p.md", "`src/pkg/gone.py`\n")
+        self.assert_clean()
+
+    def test_user_guide_page_needs_code_line(self):
+        self.write("docs/user-guide/part.md", "# Part\n\nProse.\n")
+        self.assert_flags("docs/user-guide/part.md", "Code:")
+
+    def test_user_guide_index_is_exempt(self):
+        self.write("docs/user-guide/index.md", "# Why\n\nProse.\n")
+        self.assert_clean()
+
+    def test_code_line_accepted(self):
+        self.write("docs/user-guide/part.md", "# Part\n\nCode: `src/pkg/core.py`, `src/pkg`\n")
+        self.assert_clean()
+
+    def test_code_line_path_must_exist(self):
+        self.write("docs/user-guide/part.md", "# Part\n\nCode: `nowhere/gone.py`\n")
+        self.assert_flags("docs/user-guide/part.md:3", "nowhere/gone.py")
+
+    def stubs(self):
+        self.write("docs/agent-guide/api/pkg/index.md", "::: pkg\n\n::: pkg.core\n")
+        self.write("mkdocs.yml", "nav:\n  - x: agent-guide/api/pkg/index.md\n")
+
+    def test_no_api_dir_skips_stub_check(self):
+        self.assert_clean()
+
+    def test_complete_stubs_pass(self):
+        self.stubs()
+        self.assert_clean()
+
+    def test_api_stub_missing_fails(self):
+        self.stubs()
+        self.write("src/pkg/sub/__init__.py", "")
+        self.assert_flags("pkg.sub")
+
+    def test_module_missing_from_stub_fails(self):
+        self.stubs()
+        self.write("src/pkg/extra.py", "")
+        self.assert_flags("pkg.extra")
+
+    def test_stale_api_stub_fails(self):
+        self.stubs()
+        self.write("docs/agent-guide/api/old/index.md", "::: old\n")
+        self.write("mkdocs.yml", "nav:\n  - x: agent-guide/api/pkg/index.md\n  - y: agent-guide/api/old/index.md\n")
+        self.assert_flags("old")
+
+    def test_stub_not_in_nav_fails(self):
+        self.stubs()
+        self.write("mkdocs.yml", "nav:\n  - Home: index.md\n")
+        self.assert_flags("agent-guide/api/pkg/index.md", "nav")
+
+    def test_malformed_toml_reports_clearly(self):
+        self.write(".parallax.toml", "= nonsense [\n")
+        self.assert_flags(".parallax.toml")
+
+
+if __name__ == "__main__":
+    unittest.main()
