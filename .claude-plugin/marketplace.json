@@ -5,7 +5,7 @@
     {
       "name": "parallax",
       "description": "Docs for two readers, humans and agents, that always follow the code.",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "source": "./"
     }
   ]

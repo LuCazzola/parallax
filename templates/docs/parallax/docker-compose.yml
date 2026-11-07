@@ -10,9 +10,8 @@ services:
     environment:
       - NO_MKDOCS_2_WARNING=1
     command: >
-      uvx --with mkdocs-material==9.7.7 --with mkdocstrings==1.0.6 --with mkdocstrings-python==2.0.9
-      --with griffe==2.3.0 --with mkdocs-autorefs==1.4.4 --with pymdown-extensions==11.0.2
-      mkdocs==1.6.1 serve -f docs/parallax/mkdocs.yml --dev-addr 0.0.0.0:8000 --livereload
+      uvx --with-requirements docs/parallax/requirements.txt
+      mkdocs serve -f docs/parallax/mkdocs.yml --dev-addr 0.0.0.0:8000 --livereload
 
 volumes:
   uv-cache:

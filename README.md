@@ -41,6 +41,12 @@ Then, in the repo you want to document:
 /parallax:setup
 ```
 
+Preview the docs at any time. This needs only Python:
+
+```bash
+python3 docs/parallax/tools/serve.py
+```
+
 ## What you get
 
 Your repo's docs split by who reads them:
@@ -80,8 +86,7 @@ Reasons the agent inferred are marked "Inferred, not confirmed" until you confir
 
 ## Hosting
 
-Setup asks. GitHub Actions is recommended; local (`uvx`, or `docker compose -f
-docs/parallax/docker-compose.yml up` if your repo uses Docker) and your own host also work.
+Setup asks. GitHub Actions is recommended; local (`serve.py`, above) and your own host also work.
 On a private repo, Pages needs a paid plan, and the site is normally public unless you are on
 Enterprise, so setup warns you first.
 
@@ -90,7 +95,7 @@ Enterprise, so setup warns you first.
 - Claude Code
 - Python 3.11+ and `git` (below 3.11 the hook stays silent and the checks don't run)
 - `gh` for GitHub issues (without it you get the ideas table)
-- `uv` to build the site locally (optional; Docker is never required)
+- `uv` is optional and speeds up the first preview; Docker is never required
 
 API reference generation is Python first; other languages are best effort.
 

@@ -31,9 +31,7 @@ sed -i 's#      - Glossary: agent-guide/glossary.md#      - Glossary: agent-guid
 python3 $D/tools/check_docs.py
 docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp -e NO_MKDOCS_2_WARNING=1 -v "$TMP:/repo" -w /repo \
   ghcr.io/astral-sh/uv:0.9.30-python3.12-bookworm-slim \
-  uvx --with mkdocs-material==9.7.7 --with mkdocstrings==1.0.6 --with mkdocstrings-python==2.0.9 \
-  --with griffe==2.3.0 --with mkdocs-autorefs==1.4.4 --with pymdown-extensions==11.0.2 \
-  mkdocs==1.6.1 build --strict -f docs/parallax/mkdocs.yml -d /repo/site
+  uvx --with-requirements docs/parallax/requirements.txt mkdocs build --strict -f docs/parallax/mkdocs.yml -d /repo/site
 test -f site/agent-guide/index.html
 test -f site/agent-guide/api/fixture/index.html
 test ! -e site/notes

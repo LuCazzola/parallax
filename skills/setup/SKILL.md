@@ -49,8 +49,8 @@ in `.github/workflows/`, and the stub in `CLAUDE.md`.
    there is one), `{{repo_url}}` (drop the line if there is no remote), `{{source_root}}`. Set `ignore` in `docs/parallax/parallax.toml` to the
    generated files you found.
 2. Hosting: Actions copies `templates/.github/workflows/docs.yml`, filling `{{default_branch}}`; if
-   that file exists, ask for another name rather than replacing it. Local relies on the `uvx` serve
-   command in `testing.md`. Elsewhere records the target and the build command in `testing.md`.
+   that file exists, ask for another name rather than replacing it. Local relies on
+   `docs/parallax/tools/serve.py`. Elsewhere records the target and the build command in `testing.md`.
    Delete `docs/parallax/docker-compose.yml` unless the hosting is local and the repo uses Docker.
 3. Python: add one `docs/parallax/pages/agent-guide/api/<package/as/path>/index.md` per package, with
    a `::: <package>` block per module, and list each in the nav. Other languages: use a generator
@@ -96,7 +96,8 @@ rewritten before their decision, and the outcome is a docs edit or a ticket.
    `Prio:WANTED`, `Prio:MINOR`, `needs-triage`.
 2. Run `python3 docs/parallax/tools/check_docs.py` and the strict build from
    `docs/parallax/pages/agent-guide/testing.md`. Anything still failing belongs in the drift report.
-3. Report what changed, then list every inferred reason and ask the user to confirm or correct it.
+3. Report what changed, tell the user they can preview with
+   `python3 docs/parallax/tools/serve.py`, then list every inferred reason and ask the user to confirm or correct it.
    For Actions, add that Pages' source must be set to GitHub Actions in the repo's settings.
 
 Run again on a repo already set up, only the stub between its markers and the drift report change.

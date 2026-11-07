@@ -24,10 +24,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: python3 docs/parallax/tools/check_docs.py
-      - run: >
-          pip install mkdocs==1.6.1 mkdocs-material==9.7.7 mkdocstrings==1.0.6
-          mkdocstrings-python==2.0.9 griffe==2.3.0 mkdocs-autorefs==1.4.4 pymdown-extensions==11.0.2
-      - run: mkdocs build --strict -f docs/parallax/mkdocs.yml -d "$GITHUB_WORKSPACE/site"
+      - run: python3 docs/parallax/tools/serve.py --build -d "$GITHUB_WORKSPACE/site"
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
