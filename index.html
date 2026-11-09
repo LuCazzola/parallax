@@ -60,13 +60,14 @@
   <p><small>Cambridge Dictionary</small></p>
 
   <h2>Your repo, seen from two positions</h2>
-  <p>Keeping track of what agents do is hard. They change more code than you can read, so you
-  supervise through a mental model of the system, and that model quietly drifts from what is
-  really there.</p>
-  <p>The moment you think "that's not how I imagined it" is worth catching. It might be a stale
-  page, a real bug, a design flaw, or a misunderstanding. Parallax gives your repo docs that make
-  those moments visible: a <strong>User Guide</strong> where people check the design and the
-  reasons behind it, and an <strong>Agent Guide</strong> that helps agents find their way around.</p>
+  <p>The object is your project, and it is seen from two positions. One is your agent's, working
+  in the code and changing more of it than you can read. The other is yours: your understanding of
+  what is going on, the picture you supervise through. Left alone, the two drift apart.</p>
+  <p>The moment your expectations are not met, when you think "that's not how I imagined it", is
+  worth inspecting. It might be a stale page, a real bug, a design flaw, or a misunderstanding.
+  Parallax gives your repo docs that make those moments visible: a <strong>User Guide</strong>
+  where you check the design and the reasons behind it, and an <strong>Agent Guide</strong> that
+  helps agents find their way around.</p>
   <p class="rule">The code is the oracle, docs follow, and neither implies correctness.</p>
   <p>If the code is buggy, the docs describe the bug, and a strange behaviour written in plain
   words is easier to question.</p>
@@ -75,7 +76,7 @@
   <table>
     <tr><th>setup</th><td>Run once. Builds the docs or ports yours, after showing you the plan.</td></tr>
     <tr><th>sync</th><td>Runs by itself. When code changes, pages move to match it.</td></tr>
-    <tr><th>dive</th><td>A read-only skeptic asks whether what docs and code agree on looks like a bug. Also the whole-repo check.</td></tr>
+    <tr><th>dive</th><td>A read-only diver asks whether what docs and code agree on looks like a bug. Also the whole-repo check.</td></tr>
     <tr><th>gap</th><td>When your picture differs from the docs, it reads the code and names the cause.</td></tr>
     <tr><th>ticket</th><td>Keeps a bug or idea for later, and asks first on public repos.</td></tr>
   </table>
