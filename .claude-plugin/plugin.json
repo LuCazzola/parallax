@@ -1,7 +1,7 @@
 {
   "name": "parallax",
   "description": "Docs for two readers, humans and agents, that always follow the code.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "author": { "name": "Luca Cazzola" },
   "repository": "https://github.com/LuCazzola/parallax",
   "homepage": "https://github.com/LuCazzola/parallax",
