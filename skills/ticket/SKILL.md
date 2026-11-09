@@ -9,7 +9,7 @@ Only for a repo with `docs/parallax/parallax.toml`; elsewhere this skill does no
 on normally.
 
 Keep the thought and carry on with the task at hand. Capture here; designing the idea is a
-separate job. The rules are in `docs/parallax/pages/agent-guide/ideas.md`, the scripts in `docs/parallax/tools/`.
+separate job. The rules are in `docs/parallax/pages/tickets/index.md`, the scripts in `docs/parallax/tools/`.
 
 ## Steps
 

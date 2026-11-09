@@ -94,8 +94,8 @@ class CheckDocs(unittest.TestCase):
         self.assert_flags("docs/parallax/pages/user-guide/part.md:3", "nowhere/gone.py")
 
     def stubs(self):
-        self.write("docs/parallax/pages/agent-guide/api/pkg/index.md", "::: pkg\n\n::: pkg.core\n")
-        self.write("docs/parallax/mkdocs.yml", "nav:\n  - x: agent-guide/api/pkg/index.md\n")
+        self.write("docs/parallax/pages/api/pkg/index.md", "::: pkg\n\n::: pkg.core\n")
+        self.write("docs/parallax/mkdocs.yml", "nav:\n  - x: api/pkg/index.md\n")
 
     def test_no_api_dir_skips_stub_check(self):
         self.assert_clean()
@@ -116,14 +116,14 @@ class CheckDocs(unittest.TestCase):
 
     def test_stale_api_stub_fails(self):
         self.stubs()
-        self.write("docs/parallax/pages/agent-guide/api/old/index.md", "::: old\n")
-        self.write("docs/parallax/mkdocs.yml", "nav:\n  - x: agent-guide/api/pkg/index.md\n  - y: agent-guide/api/old/index.md\n")
+        self.write("docs/parallax/pages/api/old/index.md", "::: old\n")
+        self.write("docs/parallax/mkdocs.yml", "nav:\n  - x: api/pkg/index.md\n  - y: api/old/index.md\n")
         self.assert_flags("old")
 
     def test_stub_not_in_nav_fails(self):
         self.stubs()
         self.write("docs/parallax/mkdocs.yml", "nav:\n  - Home: index.md\n")
-        self.assert_flags("agent-guide/api/pkg/index.md", "nav")
+        self.assert_flags("api/pkg/index.md", "nav")
 
     def test_renamed_top_folder_is_caught(self):
         self.write("docs/parallax/pages/index.md", "`src/pkg/core.py` and `lib_gone/pkg/core.py`\n")

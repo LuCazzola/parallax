@@ -12,7 +12,6 @@ This section is operative: it holds what the code cannot tell you quickly.
 | [Recipes](recipes.md) | add something, one recipe per kind of thing. |
 | [Testing](testing.md) | run the checks. |
 | [Glossary](glossary.md) | look up a term or convention. |
-| [Issues & Ideas](ideas.md) | keep a bug or idea for later. |
 
 ## Keeping the docs true
 

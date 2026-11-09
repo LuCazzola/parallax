@@ -1,5 +1,5 @@
 ---
-name: skeptic
+name: diver
 description: Reads code independently to test what docs claim, and asks whether behaviour that docs and code agree on looks like a bug. Dispatched by parallax:dive.
 tools: Read, Grep, Glob
 ---

@@ -52,8 +52,8 @@ in `.github/workflows/`, and the stub in `CLAUDE.md`.
    that file exists, ask for another name rather than replacing it. Local relies on
    `docs/parallax/tools/serve.py`. Elsewhere records the target and the build command in `testing.md`.
    Delete `docs/parallax/docker-compose.yml` unless the hosting is local and the repo uses Docker.
-3. Python: add one `docs/parallax/pages/agent-guide/api/<package/as/path>/index.md` per package, with
-   a `::: <package>` block per module, and list each in the nav. Other languages: use a generator
+3. Python: add one `docs/parallax/pages/api/<package/as/path>/index.md` per package, with
+   a `::: <package>` block per module, and list each under an `API` section at the end of the nav. Other languages: use a generator
    if one fits, otherwise remove `mkdocstrings` and rely on the map.
 4. Port by moving pages to the approved places with `git mv`, meaning unchanged. Convert other
    formats (`.rst`, `.mdx`) to Markdown, keeping every statement; a file MkDocs cannot render does

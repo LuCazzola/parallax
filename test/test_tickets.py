@@ -49,7 +49,7 @@ class Tickets(unittest.TestCase):
         return self.log.read_text() if self.log.exists() else ""
 
     def ideas(self):
-        return (self.parallax / "pages/agent-guide/ideas.md").read_text()
+        return (self.parallax / "pages/tickets/ideas.md").read_text()
 
     def open_idea(self):
         out = self.run_script("open", "idea", "try x", "top.py")

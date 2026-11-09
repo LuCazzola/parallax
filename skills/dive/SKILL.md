@@ -17,7 +17,7 @@ a bug? Dive changes nothing itself and never changes code.
 1. Pick the mode: **targeted** when a sync sent you here, **whole-repo** when asked about
    the docs overall or when `parallax:setup` is porting.
 2. Run `python3 docs/parallax/tools/check_docs.py` and keep its output.
-3. Dispatch the `parallax:skeptic` subagent with the brief below. Done when it returns a verdict
+3. Dispatch the `parallax:diver` subagent with the brief below. Done when it returns a verdict
    block for every claim.
 4. Act on the verdicts:
 
@@ -38,7 +38,7 @@ the code does; it changes when the code does.
 claims to test. List each statement from those pages as a claim.
 
 **Whole-repo:** every page in `docs/parallax/pages/`, split into one
-skeptic per section of the docs so each stays focused. Also ask it to check the structure:
+diver per section of the docs so each stays focused. Also ask it to check the structure:
 sections grouped by meaning, each index saying why the section exists, the map covering the
 top-level code, API stubs, `parallax.toml`, and the stub in `CLAUDE.md`.
 

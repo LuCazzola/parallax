@@ -81,4 +81,6 @@ nav:
       - Recipes: agent-guide/recipes.md
       - Testing: agent-guide/testing.md
       - Glossary: agent-guide/glossary.md
-      - Issues & Ideas: agent-guide/ideas.md
+  - Tickets:
+      - tickets/index.md
+      - Ideas: tickets/ideas.md

@@ -2,14 +2,23 @@
 
 # Parallax
 
-Docs for two readers, humans and agents, that always follow the code.
+> **parallax**, *noun*: the effect by which the position of an object seems to change when it is
+> looked at from different positions.
+> ([Cambridge Dictionary](https://dictionary.cambridge.org/dictionary/english/parallax))
 
+Docs for humans and agents that always follow the code.
 **Website:** <https://lucazzola.github.io/parallax/>
 
-Parallax is the shift you see when two viewpoints look at one object. In a codebase, the two
-viewpoints are your picture of the system and what the system does. When they disagree, that is
-worth knowing: it might be a stale page, a real bug, a design flaw, or a misunderstanding.
-Parallax is a Claude Code plugin that makes those gaps visible and gives each one somewhere to go.
+## Your repo, seen from two positions
+
+The object is your project, and it is seen from two positions. One is your agent's, working in
+the code and changing more of it than you can read. The other is yours: your understanding of what
+is going on, the picture you supervise through. Left alone, the two drift apart.
+
+The moment your expectations are not met, when you think "that's not how I imagined it", is worth
+inspecting. It might be a stale page, a real bug, a design flaw, or a misunderstanding. Parallax is
+a Claude Code plugin that gives your repo docs that make those moments visible, and gives each one
+somewhere to go.
 
 ## The hard rule
 
@@ -54,7 +63,9 @@ Your repo's docs split by who reads them:
 | Guide | For | Holds |
 |---|---|---|
 | **User Guide** | People supervising the system | Design decisions and their consequences, so you can check them against your own picture |
-| **Agent Guide** | Agents doing the work | Code map, recipes, testing, generated API reference, tickets |
+| **Agent Guide** | Agents doing the work | Code map, recipes, testing, glossary |
+| **Tickets** | Both | How tickets work, and the ideas table kept in the repo |
+| **API** | Both | Reference generated from the code |
 
 Plus an MkDocs Material site with a dark mode and colour-coded, zoomable diagrams, a docs check
 that needs no AI, and ticket scripts that work without the plugin.
@@ -65,7 +76,7 @@ that needs no AI, and ticket scripts that work without the plugin.
 |---|---|---|
 | `parallax:setup` | Once, by you | Builds the docs, or ports yours after showing you the mapping. Asks where to host them |
 | `parallax:sync` | Automatically after code changes | Moves pages to what the code does now, with the smallest edit |
-| `parallax:dive` | When sync doubts something, or when you ask | Sends a read-only skeptic to ask whether what docs and code agree on looks like a bug. Also the whole-repo health check |
+| `parallax:dive` | When sync doubts something, or when you ask | Sends a read-only diver to ask whether what docs and code agree on looks like a bug. Also the whole-repo health check |
 | `parallax:gap` | When your picture differs from the docs | Reads the code and decides: stale doc, real issue, design flaw, or misunderstanding |
 | `parallax:ticket` | When something should be kept for later | Files an idea in the repo, or a GitHub issue. Asks first on public repos |
 
