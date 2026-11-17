@@ -18,3 +18,21 @@
 .md-nav__link:hover { text-decoration: underline; }
 .md-nav__item .md-nav__link--active,
 .md-nav__item .md-nav__link--active:hover { color: #c8891b; }
+
+/* Inline SVG sketches in the guides: <svg class="parallax-fig">. Text and axes take the page
+   colour; s1-s6 stroke and f1-f6 fill use the palette of javascripts/mermaid.js. */
+.parallax-fig { --c1: #2f6db3; --c2: #2e8b57; --c3: #b8860b; --c4: #7b4fa0; --c5: #c0504d; --c6: #8a8a8a; }
+[data-md-color-scheme="slate"] .parallax-fig { --c1: #6ea8fe; --c2: #5cc98a; --c3: #e0b44c; --c4: #b48ce0; --c5: #ff8a80; --c6: #9a9a9a; }
+.parallax-fig text { font-size: 15px; fill: currentColor; }
+.parallax-fig .note { font-size: 13.5px; opacity: .7; }
+.parallax-fig .grid { stroke: currentColor; stroke-width: 1; opacity: .12; fill: none; }
+.parallax-fig .axis { stroke: currentColor; stroke-width: 1.2; opacity: .7; fill: none; }
+.parallax-fig .s1 { stroke: var(--c1); } .parallax-fig .f1 { fill: var(--c1); }
+.parallax-fig .s2 { stroke: var(--c2); } .parallax-fig .f2 { fill: var(--c2); }
+.parallax-fig .s3 { stroke: var(--c3); } .parallax-fig .f3 { fill: var(--c3); }
+.parallax-fig .s4 { stroke: var(--c4); } .parallax-fig .f4 { fill: var(--c4); }
+.parallax-fig .s5 { stroke: var(--c5); } .parallax-fig .f5 { fill: var(--c5); }
+.parallax-fig .s6 { stroke: var(--c6); } .parallax-fig .f6 { fill: var(--c6); }
+.parallax-fig :is(.s1, .s2, .s3, .s4, .s5, .s6) { fill: none; stroke-width: 3; }
+.parallax-fig .faint { opacity: .3; }
+.parallax-fig .dash { stroke-dasharray: 5 4; }

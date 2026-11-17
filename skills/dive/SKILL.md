@@ -35,7 +35,8 @@ the code does; it changes when the code does.
 ## Briefs
 
 **Targeted:** the changed paths, the pages touched, and what sync thought, labelled as
-claims to test. List each statement from those pages as a claim.
+claims to test. List each statement from those pages as a claim; a label or arrow in a
+picture is a statement too.
 
 **Whole-repo:** every page in `docs/parallax/pages/`, split into one
 diver per section of the docs so each stays focused. Also ask it to check the structure:
